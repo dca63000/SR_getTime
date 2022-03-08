@@ -41,14 +41,19 @@ for i in range(1,100): #to be optimized, hardcoded 100 max
     style=attribute.get_attribute("style")
     
     #optimization needed, look only for 1 or 0, dependent on 1 or 0.5 expected values
-    opacity=re.findall(r"\d*\.?\d+", style) 
+    opacity=re.findall(r"\d", style) 
+    if line==1:
+        opacity = ['1']; # Sometimes style not defined for first line so hacked...
     if opacity[0] != str(1): # to be optimized
         continue
         
     #Song duration sum
     nb_songs +=1
-    selector +=' td:nth-child(3)'
-    time=driver.find_element(By.CSS_SELECTOR,selector).text
+    get_time = selector+' td:nth-child(3)'
+    get_song = selector+' td:nth-child(2)'
+    time=driver.find_element(By.CSS_SELECTOR,get_time).text
+    song=driver.find_element(By.CSS_SELECTOR,get_song).text
+    print(song, " - ", time)
     min, sec = re.findall('\d+', time) #best way?
     playlist_length += datetime.timedelta(minutes=int(min), seconds=int(sec))
 
