@@ -19,8 +19,8 @@ driver=Firefox(service=service, options=options)
 URL = 'https://thornbulle.streaming.lv/?sr_playlist'
 driver.get(URL)
 
-wait = WebDriverWait(driver, 10)
-time.sleep(10)
+wait = WebDriverWait(driver, 5)
+time.sleep(5)
 
 print(driver.title)
 
@@ -45,7 +45,7 @@ for i in range(1,100): #to be optimized, hardcoded 100 max
     if line==1:
         opacity = ['1']; # Sometimes style not defined for first line so hacked...
     if opacity[0] != str(1): # to be optimized
-        continue
+        break
         
     #Song duration sum
     nb_songs +=1
@@ -54,15 +54,25 @@ for i in range(1,100): #to be optimized, hardcoded 100 max
     time=driver.find_element(By.CSS_SELECTOR,get_time).text
     song=driver.find_element(By.CSS_SELECTOR,get_song).text
     print(song, " - ", time)
-    min, sec = re.findall('\d+', time) #best way?
+    items = re.findall('\d+', time) 
+    if len(items)==1:
+        min=items[0]
+        sec=0
+    elif len(items)>1:    
+        min=items[0]
+        sec=items[1]
+    else:
+        print("empty duration ? ", len(items))
     playlist_length += datetime.timedelta(minutes=int(min), seconds=int(sec))
 
 print("Nb songs to come: ", nb_songs, " duration: ", playlist_length)
+driver.quit()
 
 #When will the active playlist end ?
 # Dunno, how to get the start time of the ongoing [0] item ?
 
 #For fun
 now=datetime.datetime.now()
+now=now.replace(hour=11,minute=0,second=0) # for now to be added by hand
 end=now+playlist_length
 print(end)
